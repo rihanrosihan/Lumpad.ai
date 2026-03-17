@@ -26,3 +26,14 @@ def verify(
     except Exception as e:
         print("ERROR:", str(e))
         return Response(content="error", media_type="text/plain")
+# ✅ endpoint webhook POST (buat terima event)
+@app.post("/webhook")
+async def webhook(req: Request):
+    data = await req.json()
+    print("EVENT:", data)
+    return {"ok": True}
+
+# optional (biar tetap aman jalan di local/railway)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
