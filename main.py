@@ -12,10 +12,15 @@ def root():
 
 # ✅ endpoint webhook GET (buat verifikasi Strava)
 @app.get("/webhook")
-def verify(mode: str = None, token: str = None, challenge: str = None):
-    if token == VERIFY_TOKEN:
-        return {"challenge": challenge}
-    return {"error": "invalid"}
+def verify(request: Request):
+    mode = request.query_params.get("hub.mode")
+    token = request.query_params.get("hub.verify_token")
+    challenge = request.query_params.get("hub.challenge")
+
+    if mode == "subscribe" and token == VERIFY_TOKEN:
+        return int(challenge)
+
+    return {"error": "verification failed"}
 
 # ✅ endpoint webhook POST (buat terima event)
 @app.post("/webhook")
