@@ -18,9 +18,9 @@ def verify(request: Request):
     challenge = request.query_params.get("hub.challenge")
 
     if mode == "subscribe" and token == VERIFY_TOKEN:
-        return int(challenge)
+        return Response(content=challenge, media_type="text/plain")
 
-    return {"error": "verification failed"}
+    return Response(content="forbidden", status_code=403)
 
 # ✅ endpoint webhook POST (buat terima event)
 @app.post("/webhook")
