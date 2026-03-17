@@ -8,20 +8,21 @@ app = FastAPI()
 VERIFY_TOKEN = "lumpad123"
 
 @app.get("/webhook")
-def verify(request: Request):
-    mode = request.query_params.get("hub.mode")
-    token = request.query_params.get("hub.verify_token")
-    challenge = request.query_params.get("hub.challenge")
+def verify(
+    hub_mode: str = None,
+    hub_verify_token: str = None,
+    hub_challenge: str = None
+):
+    print("MODE:", hub_mode)
+    print("TOKEN:", hub_verify_token)
+    print("CHALLENGE:", hub_challenge)
 
-    # debug print (opsional, bantu lihat di logs)
-    print("MODE:", mode)
-    print("TOKEN:", token)
-    print("CHALLENGE:", challenge)
+    # kalau semua valid → balikin challenge
+    if hub_mode == "subscribe" and hub_verify_token == VERIFY_TOKEN and hub_challenge:
+        return Response(content=str(hub_challenge), media_type="text/plain")
 
-    if mode == "subscribe" and token == VERIFY_TOKEN and challenge:
-        return Response(content=str(challenge), media_type="text/plain")
-
-    return Response(content="forbidden", status_code=403)
+    # kalau request aneh → jangan crash, tetap 200
+    return Response(content="ok", media_type="text/plain")
 
 # ✅ endpoint webhook POST (buat terima event)
 @app.post("/webhook")
