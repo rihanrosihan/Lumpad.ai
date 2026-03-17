@@ -1,24 +1,25 @@
 import os
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 import uvicorn
+
 
 app = FastAPI()
 
 VERIFY_TOKEN = "lumpad123"
 
-@app.get("/")
-def root():
-    return {"status": "Lumpad running 🚀"}
-
-# ✅ endpoint webhook GET (buat verifikasi Strava)
 @app.get("/webhook")
 def verify(request: Request):
     mode = request.query_params.get("hub.mode")
     token = request.query_params.get("hub.verify_token")
     challenge = request.query_params.get("hub.challenge")
 
-    if mode == "subscribe" and token == VERIFY_TOKEN:
-        return Response(content=challenge, media_type="text/plain")
+    # debug print (opsional, bantu lihat di logs)
+    print("MODE:", mode)
+    print("TOKEN:", token)
+    print("CHALLENGE:", challenge)
+
+    if mode == "subscribe" and token == VERIFY_TOKEN and challenge:
+        return Response(content=str(challenge), media_type="text/plain")
 
     return Response(content="forbidden", status_code=403)
 
